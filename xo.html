@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <style>
+    body {
+    font-family: "Arial", sans-serif;
+}
+.game-title{
+    color: #554f1c; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0;
+
+}
+section {
+    text-align: center;
+}
+.game-container {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    width: 306px;
+    margin: 50px auto;
+}
+.box {
+    font-family: "Permanent Marker", cursive;
+    width: 100px;
+    height: 100px;
+    box-shadow: 0 0 0 1px #333333;
+    border: 1px solid #333333;
+    cursor: pointer;
+line-height: 100px;
+    font-size: 60px;
+}
+.results{
+    font-size: 30px;
+}
+
+.playero, .playerx {
+    font-size: 25px;
+    color: blue;
+}
+  </style>
+    <title>Tic Tac Game</title>
+   
+</head>
+<body>
+    <section>
+        <h1 class="game-title">Tic Tac Game</h1>
+        <div class="game-container">
+            <div index-box="0" class="box"></div>
+            <div index-box="1" class="box"></div>
+            <div index-box="2" class="box"></div>
+            <div index-box="3" class="box"></div>
+            <div index-box="4" class="box"></div>
+            <div index-box="5" class="box"></div>
+            <div index-box="6" class="box"></div>
+            <div index-box="7" class="box"></div>
+            <div index-box="8" class="box"></div>
+        </div>
+        <h2 class="game-status"></h2>
+        <button class="game-restart">Restart Game</button>
+        <div class="results">
+            <label> Player X :</label>
+            <label class="playerx"></label>
+        </div>
+        <div class="results">
+            <label> Player O :</label>
+            <label class="playero"></label>
+        </div>
+    </section>
+<script src="script.js"></script>
+<script>
+   const statusDisplay = document.querySelector('.game-status');
+
+let gameActive = true;
+let currentPlayer = "X";
+let gameState = ["", "", "", "", "", "", "", "", ""];
+
+const winningMessage = () => `Player ${currentPlayer} won!`;
+const drawMessage = () => `Game ended in a draw!`;
+const currentPlayerTurn = () => `It's ${currentPlayer}'s turn`;
+let counter=[0,0];
+const statusPlayerX=document.querySelector('.playerx');
+const statusPlayerO=document.querySelector('.playero');
+const playerX = () => `${counter[0]}`;
+const playerO = () => `${counter[1]}`;
+
+
+
+statusDisplay.innerHTML = currentPlayerTurn();
+statusPlayerX.innerHTML = playerX();
+statusPlayerO.innerHTML = playerO();
+
+
+const winningConditions = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
+
+function boxPlayed(clickedBox, clickedBoxIndex) {
+    gameState[clickedBoxIndex] = currentPlayer;
+    clickedBox.innerHTML = currentPlayer;
+}
+
+function playerChange() {
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    statusDisplay.innerHTML = currentPlayerTurn();
+}
+
+function resultValidation() {
+    let won = false;
+    for (let i = 0; i <= 7; i++) {
+        const winCondition = winningConditions[i];
+        let a = gameState[winCondition[0]];
+        let b = gameState[winCondition[1]];
+        let c = gameState[winCondition[2]];
+        if (a === '' || b === '' || c === '') {
+            continue;
+        }
+        if (a === b && b === c) {
+            won = true;
+            if (currentPlayer==="X"){
+                counter[0]++;
+            }else {
+                counter[1]++;
+            }
+            statusPlayerX.innerHTML = playerX();
+            statusPlayerO.innerHTML = playerO();
+            if (counter[0]==5){
+             playerXwon();
+            }
+            if (counter[1]==5){
+                playerOwon();
+            }
+            break
+        }
+    }
+
+    if (won) {
+        statusDisplay.innerHTML = winningMessage();
+        gameActive = false;
+        return;
+    }
+
+    let draw = !gameState.includes("");
+    if (draw) {
+        statusDisplay.innerHTML = drawMessage();
+        gameActive = false;
+        return;
+    }
+
+    playerChange();
+}
+function playerXwon(){
+    alert('player X won all the game');
+    counter[0]=0;
+    counter[1]=0;
+    
+ 
+}
+function playerOwon(){
+    alert('player O won all the game');
+    counter[0]=0;
+    counter[1]=0;
+  
+
+}
+
+function boxClick(clickedBoxEvent) {
+    const clickedBox = clickedBoxEvent.target;
+    console.log(clickedBox);
+    const clickedBoxIndex = parseInt(clickedBox.getAttribute('index-box'));
+
+    if (gameState[clickedBoxIndex] !== "" || !gameActive) {
+        return;
+    }
+
+    boxPlayed(clickedBox, clickedBoxIndex);
+    resultValidation();
+}
+
+function restartGame() {
+    gameActive = true;
+    currentPlayer = "X";
+    gameState = ["", "", "", "", "", "", "", "", ""];
+    statusDisplay.innerHTML = currentPlayerTurn();
+    statusPlayerX.innerHTML = playerX();
+    statusPlayerO.innerHTML = playerO();
+    document.querySelectorAll('.box').forEach(box => box.innerHTML = "");
+}
+
+document.querySelectorAll('.box').forEach(box => box.addEventListener('click', boxClick));
+document.querySelector('.game-restart').addEventListener('click', restartGame);
+</script>
+</body>
+</html>
